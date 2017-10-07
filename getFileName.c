@@ -61,14 +61,7 @@ void getLine (char *buff, size_t sz) {
     	buff[strlen(buff)-1] = '\0';
     	rc = OK;
 
-    	if (rc == NO_INPUT) 
-    	{
-    	    printf ("\nNo input\n");
-    	}
-    	if (rc == TOO_LONG) 
-    	{
-    	    printf ("Input too long [%s]\n", buff);
-    	}
+
 	} while(rc != OK);
 
 }

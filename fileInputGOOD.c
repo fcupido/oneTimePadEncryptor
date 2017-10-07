@@ -13,7 +13,7 @@ int getLine (char* buffer, size_t sz);
 int main(void)
 {
 	char fileName [20];
-
+	FILE *f;
 	printf("Enter Filename: ");
 	int read = 0;
 
@@ -24,7 +24,7 @@ int main(void)
 		}
 		if (read == 1)
 		{
-			FILE *f = fopen(fileName, "r"); // returns 0 for invalid filename, 2 for good file
+			f = fopen(fileName, "r"); // returns 0 for invalid filename, 2 for good file
 			if (f == NULL)
 			{
 				printf("Could not open %s. Try different name? y/n: ", fileName);
