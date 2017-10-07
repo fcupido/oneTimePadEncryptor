@@ -7,7 +7,7 @@
 void encrypt(void);
 void decrypt(void);
 int getLine (char* buffer, size_t sz); // array, sizeof array, 
-FILE* getFilePtr(char * prompt);
+FILE* getFilePtr(char * prompt, int * charCount);
 void flush (void);
 FILE* keyGen(int);
 
@@ -47,8 +47,9 @@ void encrypt(void)
 {
 	char answer;
 	FILE* key;
+	int keyLen = 0, messageLen = 0;
 
-	FILE* message = getFilePtr("Enter name of file to encript: ");
+	FILE* message = getFilePtr("Enter name of file to encript: ", &messageLen);
 
 	while(answer != 'y' && answer != 'n')
 	{
@@ -64,8 +65,7 @@ void encrypt(void)
 
 	if (answer == 'n')
 	{
-		flush();
-		key = getFilePtr("Enter key filename: ");
+		key = getFilePtr("Enter key filename: ", &keyLen);
 	}
 
 	
@@ -73,7 +73,7 @@ void encrypt(void)
 
 }
 
-FILE* getFilePtr(char * prompt)
+FILE* getFilePtr(char * prompt, int * lenth)
 {
 	char fileName [20];
 	FILE *f;
@@ -107,9 +107,11 @@ FILE* getFilePtr(char * prompt)
 				char c = fgetc(f);
 				while(c != EOF)
 				{
+					(*lenth)++;
 					printf("%c", c);
 					c = fgetc(f);
 				}
+				printf("\nChar count: %d\n", *lenth);
 				read = 2;
 			}
 		}
