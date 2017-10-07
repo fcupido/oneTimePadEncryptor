@@ -60,7 +60,7 @@ void encrypt(void)
 	if (answer == 'y')
 	{
 		printf("answered yes\n");
-		key = keyGen(256 * 8);
+		key = keyGen(messageLen * 8);
 	}
 
 	if (answer == 'n')
@@ -68,8 +68,7 @@ void encrypt(void)
 		key = getFilePtr("Enter key filename: ", &keyLen);
 	}
 
-	
-	printf("%lu\n", key);
+	short binMessage [8 * messageLen];
 
 }
 
@@ -104,13 +103,14 @@ FILE* getFilePtr(char * prompt, int * lenth)
 			else
 			{
 				printf("File read successful. The contents of the file are: \n");
-				char c = fgetc(f);
+				char c = fgetc(f);			
 				while(c != EOF)
 				{
 					(*lenth)++;
 					printf("%c", c);
 					c = fgetc(f);
 				}
+				rewind(f);
 				printf("\nChar count: %d\n", *lenth);
 				read = 2;
 			}
