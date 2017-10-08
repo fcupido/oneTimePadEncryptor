@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 	
 	do // Encript or decript
 	{
-		printf("en: Encrypt / de: Decrypt: ");
+		fprintf(stderr,"en: Encrypt / de: Decrypt: ");
 		fgets(input,3, stdin);
 
 		if (!strcmp(input, "en"))
@@ -35,13 +35,13 @@ int main(int argc, char const *argv[])
 	switch (estate)
 	{
 		case 1: // ENCRYPTION
-		printf("got to the Encrypt case\n" );
+		fprintf(stderr,"got to the Encrypt case\n" );
 		encrypt();
 
 		break;
 
 		case 2: 
-		printf("%s\n", "got to the decryption case");
+		fprintf(stderr,"%s\n", "got to the decryption case");
 		decrypt();
 
 		break;
@@ -57,7 +57,7 @@ void decrypt()
 
 	do{
 		crypto = getFilePtr("Enter cryptograph filename: ", &cryptoLength);
-		printf("Used this file? y/n: \n");
+		fprintf(stderr,"Used this file? y/n: \n");
 		answer = getchar();
 	}while(answer != 'y');
 
@@ -83,13 +83,13 @@ void encrypt(void)
 
 	while(answer != 'y' && answer != 'n')
 	{
-		printf("Generate new key? y/n: ");
+		fprintf(stderr,"Generate new key? y/n: ");
 		answer = getchar();
 	}
 
 	if (answer == 'y')
 	{
-		printf("answered yes\n");
+		fprintf(stderr,"answered yes\n");
 		key = keyGen(messageLen * 8);
 	}
 
@@ -97,7 +97,7 @@ void encrypt(void)
 	{
 		key = getFilePtr("Enter key filename: ", &keyLen);
 	}
-	printf("Got to file to bin function\n");
+	fprintf(stderr,"Got to file to bin function\n");
 	
 	char binMessage [8 * messageLen];
 	char crypto [8 * messageLen];
@@ -106,12 +106,12 @@ void encrypt(void)
 
 	xor (binMessage, key, crypto, messageLen);
 
-	printf("\nCryto Message generated, enter target name: ");
+	fprintf(stderr,"\nCryto Message generated, enter target name: ");
 	char cryptoName [20];
 	getLine(cryptoName, sizeof(cryptoName));
 
 	genFile(cryptoName, crypto, 8 * messageLen);
-	printf("File Created\n");
+	fprintf(stderr,"File Created\n");
 
 }
 
@@ -119,7 +119,7 @@ FILE* getFilePtr(char * prompt, int * lenth)
 {
 	char fileName [20];
 	FILE *f;
-	printf("%s", prompt);
+	fprintf(stderr,"%s", prompt);
 	int read = 0;
 	flush();
 
@@ -127,35 +127,35 @@ FILE* getFilePtr(char * prompt, int * lenth)
 		if (read == 0)
 		{
 			read = getLine(fileName, sizeof(fileName)); // returns 0 for error, 1 for calid string
-			printf("Line Read: [%s] readValue = %d\n", fileName, read);
+			fprintf(stderr,"Line Read: [%s] readValue = %d\n", fileName, read);
 		}
 		if (read == 1)
 		{
 			f = fopen(fileName, "r"); // returns 0 for invalid filename, 2 for good file
 			if (f == NULL)
 			{
-				printf("Could not open %s. Try different name? y/n: ", fileName);
+				fprintf(stderr,"Could not open %s. Try different name? y/n: ", fileName);
 				if (fgetc(stdin) == 'y')
 				{
 					read = 0;
 					flush(); // Flushing stdin
-					printf("Enter Filename: ");
+					fprintf(stderr,"Enter Filename: ");
 				}
 				else
 					return f;
 			}
 			else
 			{
-				printf("File read successful. The contents of the file are: \n");
+				fprintf(stderr,"File read successful. The contents of the file are: \n");
 				char c = fgetc(f);			
 				while(c != EOF)
 				{
 					(*lenth)++;
-					printf("%c", c);
+					fprintf(stderr,"%c", c);
 					c = fgetc(f);
 				}
 				rewind(f);
-				printf("\nChar count: %d\n", *lenth);
+				fprintf(stderr,"\nChar count: %d\n", *lenth);
 				read = 2;
 			}
 		}
@@ -171,7 +171,7 @@ int getLine (char* buffer, size_t sz)
 	fgets(buffer, sz, stdin);
 	if (isalnum(buffer[0]) == 0)
 	{
-		printf("invalid Input. Try again: ");
+		fprintf(stderr,"invalid Input. Try again: ");
 		return 0;
 	}
 	buffer[strlen(buffer) - 1] = '\0';
@@ -187,7 +187,7 @@ FILE* keyGen(int lenth)
 {	
 	flush();
 	char fileName [20];
-	printf("Enter target filename: ");
+	fprintf(stderr,"Enter target filename: ");
 	getLine(fileName, sizeof(fileName));
 
 	FILE *f = fopen(fileName, "w");
@@ -219,21 +219,21 @@ void xor (char* messageC, FILE * key, char* crypto, int charCount)
 
 void FILEToBin (FILE* message, char* dest, int charCount)
 {
-	printf("Plaintext Binary message:\n");
+	fprintf(stderr,"Plaintext Binary message:\n");
 	char * temp = dest;
 	int c;
 	for(int j = 0; j < charCount; j++)
 	{
-		printf("%5d  ", j); // for debug
+		fprintf(stderr,"%5d  ", j); // for debug
 		c = fgetc(message);
 		for (int i = 0; i < 8; ++i)
 		{
 			*temp = c % 2 + '0';
 			c = c / 2;
-			printf("%c", *temp); // fpr debug
+			fprintf(stderr,"%c", *temp); // fpr debug
 			temp++; 
 		}
-		printf("\n"); // for debug
+		fprintf(stderr,"\n"); // for debug
 
 	}
 }
@@ -250,14 +250,14 @@ void genFile (char * fileName, char * content, int charCount)
 
 void xorDE (FILE* crypto, FILE * key, char* plain, int charCount)
 {
-	printf("Plaintext Binary message:\n");
+	fprintf(stderr,"Plaintext Binary message:\n");
 	char k;
 	char c;
 	for (int i = 0; i < charCount; ++i)
 	{	
 		if (i % 8 == 0)
 		{
-			printf("\n%5d   ", i / 8);
+			fprintf(stderr,"\n%5d   ", i / 8);
 		}
 		c = fgetc(crypto);
 		k = fgetc(key);
@@ -265,7 +265,7 @@ void xorDE (FILE* crypto, FILE * key, char* plain, int charCount)
 			plain[i] = '0';
 		else
 			plain[i] = '1';
-		printf("%c", plain[i]);
+		fprintf(stderr,"%c", plain[i]);
 	}
 
 }
