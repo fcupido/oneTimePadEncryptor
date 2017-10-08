@@ -56,19 +56,38 @@ void decrypt()
 	FILE* crypto;
 
 	do{
+		cryptoLength = 0;
 		crypto = getFilePtr("Enter cryptograph filename: ", &cryptoLength);
 		fprintf(stderr,"Used this file? y/n: \n");
 		answer = getchar();
 	}while(answer != 'y');
 
-	int keyLen;
+	int keyLen = 0;
 	FILE* key = getFilePtr("Enter KEY filename: ", &keyLen);
 
-	char binMessage [cryptoLength / 8];
+	printf("cryptoLength: %d\n", keyLen);
+
+	char binMessage [cryptoLength];
 
 	xorDE (crypto, key, binMessage, cryptoLength);
+	printf("Going into bin to char\n");
+	
+	
+	for (int i = 0; i < cryptoLength; i += 8)
+	{
+		printf("%d  ", i);
+		answer = '0' - '0';
+		answer += (binMessage[i] - '0');
+		answer += (2*(binMessage[i+1] - '0'));
+		answer += (4*(binMessage[i+2] - '0'));
+		answer += (8*(binMessage[i+3] - '0'));
+		answer += (16*(binMessage[i+4] - '0'));
+		answer += (32*(binMessage[i+5] - '0'));
+		answer += (64*(binMessage[i+6] - '0'));
+		answer += (128*(binMessage[i+7] - '0'));
 
-	genFile("binDecrypted", binMessage, cryptoLength / 8);
+		fprintf(stderr, "answer comes out to %c\n", answer );
+	}
 
 }
 
@@ -250,22 +269,18 @@ void genFile (char * fileName, char * content, int charCount)
 
 void xorDE (FILE* crypto, FILE * key, char* plain, int charCount)
 {
-	fprintf(stderr,"Plaintext Binary message:\n");
+	fprintf(stderr,"Plaintext Binary message xorDe:\n");
 	char k;
 	char c;
 	for (int i = 0; i < charCount; ++i)
 	{	
-		if (i % 8 == 0)
-		{
-			fprintf(stderr,"\n%5d   ", i / 8);
-		}
 		c = fgetc(crypto);
 		k = fgetc(key);
 		if(c == k)
 			plain[i] = '0';
 		else
 			plain[i] = '1';
-		fprintf(stderr,"%c", plain[i]);
+		printf("%c", plain[i]);
 	}
 
 }
