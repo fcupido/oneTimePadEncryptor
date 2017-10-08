@@ -211,6 +211,11 @@ FILE* keyGen(int lenth)
 	{
 		fprintf(f, "%d", ((int)rand()) % 2);
 	}
+
+	fclose(f);
+
+	f = fopen(fileName, "r");
+
 	return f;
 }
 
@@ -278,5 +283,4 @@ void xorDE (FILE* crypto, FILE * key, char* plain, int charCount)
 			plain[i] = '1';
 		printf("%c", plain[i]);
 	}
-
 }
