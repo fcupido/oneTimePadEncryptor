@@ -10,14 +10,15 @@ int getLine (char* buffer, size_t sz); // array, sizeof array,
 FILE* getFilePtr(char * prompt, int * charCount);
 void flush (void);
 FILE* keyGen(int);
-
+void xor (char * message, FILE * key, char* crypto, int charCount);
+void FILEToBin (FILE* message, char* dest, int charCount);
 
 int main(int argc, char const *argv[])
 {
 	char input [3];
 	int estate = 0;
 	
-	do
+	do // Encript or decript
 	{
 		printf("en: Encrypt / de: Decrypt: ");
 		fgets(input,3, stdin);
@@ -67,8 +68,14 @@ void encrypt(void)
 	{
 		key = getFilePtr("Enter key filename: ", &keyLen);
 	}
+	printf("Got to file to bin function\n");
+	
+	char binMessage [8 * messageLen];
+	char crypto [8 * messageLen];
 
-	short binMessage [8 * messageLen];
+	FILEToBin(message, binMessage, messageLen);
+
+	xor (binMessage, key, crypto, messageLen);
 
 }
 
@@ -152,4 +159,33 @@ FILE* keyGen(int lenth)
 		fprintf(f, "%d", ((int)rand()) % 2);
 	}
 	return f;
+}
+
+void xor (char* message, FILE * key, char* crypto, int charCount)
+{
+	for (int i = 0; i < charCount; ++i)
+	{
+		/* code */
+	}
+
+}
+
+void FILEToBin (FILE* message, char* dest, int charCount)
+{
+	char * temp = dest;
+	int c;
+	for(int j = 0; j < charCount; j++)
+	{
+		printf("%5d  ", j); // for debug
+		c = fgetc(message);
+		for (int i = 0; i < 8; ++i)
+		{
+			*temp = c % 2;
+			c = c / 2;
+			printf("%d", *temp); // fpr debug
+			temp++; 
+		}
+		printf("\n"); // for debug
+
+	}
 }
