@@ -51,8 +51,16 @@ int main(int argc, char const *argv[])
 
 void decrypt()
 {
+	char answer;
 	int cryptoLength;
-	FILE* crypto = getFilePtr("Enter cryptograph filename: ", &cryptoLength);
+	FILE* crypto;
+
+	do{
+		crypto = getFilePtr("Enter cryptograph filename: ", &cryptoLength);
+		printf("Used this file? y/n: \n");
+		answer = getchar();
+	}while(answer != 'y');
+
 	int keyLen;
 	FILE* key = getFilePtr("Enter KEY filename: ", &keyLen);
 
@@ -63,12 +71,6 @@ void decrypt()
 	genFile("binDecrypted", binMessage, cryptoLength / 8);
 
 }
-
-
-
-
-
-
 
 
 void encrypt(void)
