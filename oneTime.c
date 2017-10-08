@@ -65,17 +65,14 @@ void decrypt()
 	int keyLen = 0;
 	FILE* key = getFilePtr("Enter KEY filename: ", &keyLen);
 
-	printf("cryptoLength: %d\n", keyLen);
-
 	char binMessage [cryptoLength];
 
 	xorDE (crypto, key, binMessage, cryptoLength);
-	printf("Going into bin to char\n");
+	printf("\n\n Converting to plaintext.\n\n");
 	
 	
 	for (int i = 0; i < cryptoLength; i += 8)
 	{
-		printf("%d  ", i);
 		answer = '0' - '0';
 		answer += (binMessage[i] - '0');
 		answer += (2*(binMessage[i+1] - '0'));
@@ -86,7 +83,7 @@ void decrypt()
 		answer += (64*(binMessage[i+6] - '0'));
 		answer += (128*(binMessage[i+7] - '0'));
 
-		fprintf(stderr, "answer comes out to %c\n", answer );
+		fprintf(stderr, "%c", answer );
 	}
 
 }
@@ -116,7 +113,6 @@ void encrypt(void)
 	{
 		key = getFilePtr("Enter key filename: ", &keyLen);
 	}
-	fprintf(stderr,"Got to file to bin function\n");
 	
 	char binMessage [8 * messageLen];
 	char crypto [8 * messageLen];
@@ -125,7 +121,7 @@ void encrypt(void)
 
 	xor (binMessage, key, crypto, messageLen);
 
-	fprintf(stderr,"\nCryto Message generated, enter target name: ");
+	fprintf(stderr,"\nCryto Message generated, enter target filename: ");
 	char cryptoName [20];
 	getLine(cryptoName, sizeof(cryptoName));
 
@@ -165,7 +161,7 @@ FILE* getFilePtr(char * prompt, int * lenth)
 			}
 			else
 			{
-				fprintf(stderr,"File read successful. The contents of the file are: \n");
+				fprintf(stderr,"File read successful. The contents of the file are: \n\n");
 				char c = fgetc(f);			
 				while(c != EOF)
 				{
@@ -174,7 +170,7 @@ FILE* getFilePtr(char * prompt, int * lenth)
 					c = fgetc(f);
 				}
 				rewind(f);
-				fprintf(stderr,"\nChar count: %d\n", *lenth);
+				fprintf(stderr,"\nChar count: %d\n\n", *lenth);
 				read = 2;
 			}
 		}
