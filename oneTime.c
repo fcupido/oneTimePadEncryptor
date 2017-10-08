@@ -10,7 +10,7 @@ int getLine (char* buffer, size_t sz); // array, sizeof array,
 FILE* getFilePtr(char * prompt, int * charCount);
 void flush (void);
 FILE* keyGen(int);
-void xor (char * message, FILE * key, char* crypto, int charCount);
+void xor (char * messageC, FILE * key, char* crypto, int charCount);
 void FILEToBin (FILE* message, char* dest, int charCount);
 
 int main(int argc, char const *argv[])
@@ -161,11 +161,21 @@ FILE* keyGen(int lenth)
 	return f;
 }
 
-void xor (char* message, FILE * key, char* crypto, int charCount)
+void xor (char* messageC, FILE * key, char* crypto, int charCount)
 {
-	for (int i = 0; i < charCount; ++i)
+	char k;
+	char* message = messageC;
+
+	for (int i = 0; i < charCount * 8; ++i)
 	{
-		/* code */
+		k = fgetc(key);
+		if(*message == k)
+			crypto[i] = '0';
+		else
+			crypto[i] = '1';
+		printf("message: %c  key: %c  xor: %c \n", *message, k, crypto[i] );
+
+		message++;
 	}
 
 }
@@ -180,9 +190,9 @@ void FILEToBin (FILE* message, char* dest, int charCount)
 		c = fgetc(message);
 		for (int i = 0; i < 8; ++i)
 		{
-			*temp = c % 2;
+			*temp = c % 2 + '0';
 			c = c / 2;
-			printf("%d", *temp); // fpr debug
+			printf("%c", *temp); // fpr debug
 			temp++; 
 		}
 		printf("\n"); // for debug
