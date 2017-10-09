@@ -158,16 +158,15 @@ FILE* getFilePtr(char * prompt, int * lenth)
 			}
 			else
 			{
-				fprintf(stderr,"\nFile read successful. The contents of the file are: \n\n");
+				fprintf(stderr,"\nFile read successful. ");
 				char c = fgetc(f);			
 				while(c != EOF)
 				{
 					(*lenth)++;
-					fprintf(stderr,"%c", c);
 					c = fgetc(f);
 				}
 				rewind(f);
-				fprintf(stderr,"\nChar count: %d\n\n", *lenth);
+				fprintf(stderr,"Char count: %d\n\n", *lenth);
 				read = 2;
 			}
 		}
