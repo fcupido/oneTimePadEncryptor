@@ -23,30 +23,35 @@ int main(int argc, char const *argv[])
 	
 	do // Encript or decript
 	{
-		fprintf(stderr,"en: Encrypt / de: Decrypt: ");
-		fgets(input,3, stdin);
+		fprintf(stderr,"'en' to encrypt \n'de' to decrypt:\n ");
 
+		input[0] = fgetc(stdin);
+		input[1] = fgetc(stdin);
+		input[2] = '\0';
+
+		if(fgetc(stdin) != '\n')
+		{
+			while(fgetc(stdin) != '\n'){}
+			continue;
+		}
 		if (!strcmp(input, "en"))
 			estate = 1;
 		if (!strcmp(input, "de"))
 			estate = 2;
+
 	} while(estate == 0);
 
 	switch (estate)
 	{
 		case 1: // ENCRYPTION
-		fprintf(stderr,"got to the Encrypt case\n" );
 		encrypt();
 
 		break;
 
 		case 2: 
-		fprintf(stderr,"%s\n", "got to the decryption case");
 		decrypt();
-
 		break;
 	}
-
 }
 
 void decrypt()
