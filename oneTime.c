@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <math.h>
 
 void encrypt(void);
 void decrypt(void);
@@ -205,14 +206,24 @@ FILE* keyGen(int lenth)
 {	
 	flush();
 	char fileName [20];
+	char c = '\0';
+	FILE *f;
+
 	fprintf(stderr,"\nEnter target filename: ");
 	getLine(fileName, sizeof(fileName));
 
-	FILE *f = fopen(fileName, "w");
+	f = fopen(fileName, "w");
 	srand((unsigned)time(NULL));
+
+
 	for (int i = 0; i < lenth; ++i)
 	{
-		fprintf(f, "%d", ((int)rand()) % 2);
+		if (i % 8 == 0)
+			c = 0;
+		c += ((int)pow(2, i % 8)) * ((int)rand() % 2);
+
+		if((i + 1) % 8 == 0)
+		fprintf(f, "%c", c);
 	}
 
 	fclose(f);
@@ -221,6 +232,7 @@ FILE* keyGen(int lenth)
 	fprintf(stderr,"\nKey generated, saved as: %s.", fileName);
 	return f;
 }
+
 
 void xor (char* messageC, FILE * key, char* crypto, int charCount)
 {
