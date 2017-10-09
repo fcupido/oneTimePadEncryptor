@@ -101,7 +101,6 @@ void encrypt(void)
 
 	if (answer == 'y')
 	{
-		fprintf(stderr,"answered yes\n");
 		key = keyGen(messageLen * 8);
 	}
 
@@ -153,7 +152,10 @@ FILE* getFilePtr(char * prompt, int * lenth)
 					fprintf(stderr,"Enter Filename: ");
 				}
 				else
-					return f;
+				{
+					printf("Terminating program.\n");
+					exit(-1);
+				}
 			}
 			else
 			{
@@ -211,7 +213,7 @@ FILE* keyGen(int lenth)
 	fclose(f);
 
 	f = fopen(fileName, "r");
-
+	printf("Key generated, saved as %s\n", fileName);
 	return f;
 }
 
