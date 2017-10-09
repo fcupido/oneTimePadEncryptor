@@ -25,15 +25,6 @@ int main(int argc, char const *argv[])
 	{
 		fgets(input,3, stdin);
 
-		input[0] = fgetc(stdin);
-		input[1] = fgetc(stdin);
-		input[2] = '\0';
-
-		if(fgetc(stdin) != '\n')
-		{
-			while(fgetc(stdin) != '\n'){}
-			continue;
-		}
 		if (!strcmp(input, "en"))
 			estate = 1;
 		else if (!strcmp(input, "de"))
