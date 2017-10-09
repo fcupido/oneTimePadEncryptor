@@ -13,15 +13,21 @@ int main(void)
 	FILE* dest = fopen("destination.txt","w");
 
 	FILEToBin(message, dest);
+
+	printf("Saved as: destination.txt\n");
 }
 
 
 void FILEToBin (FILE* message, FILE* dest)
 {
 	int c = 0;
-	for(int j = 0; j < 1000 / 8; j++)
+	for(int j = 0; 1; j++)
 	{
 		c = fgetc(message);
+		if (c == EOF)
+		{
+			break;
+		}
 		for (int i = 0; i < 8; ++i)
 		{
 			fprintf(dest, "%c", (c % 2) + '0');
