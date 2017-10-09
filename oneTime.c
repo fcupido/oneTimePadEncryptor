@@ -20,15 +20,14 @@ int main(int argc, char const *argv[])
 {
 	char input [3];
 	int estate = 0;
-	
+	fprintf(stderr,"en: Encrypt / de: Decrypt: ");
 	do // Encript or decript
 	{
-		fprintf(stderr,"en: Encrypt / de: Decrypt: ");
 		fgets(input,3, stdin);
 
 		if (!strcmp(input, "en"))
 			estate = 1;
-		if (!strcmp(input, "de"))
+		else if (!strcmp(input, "de"))
 			estate = 2;
 	} while(estate == 0);
 
