@@ -48,26 +48,36 @@ int main(int argc, char const *argv[])
 void decrypt()
 {
 	char answer;
-	int cryptoLength;
+	char fileName [20];
+	int cryptoLen = 0, keyLen = 0;
 	FILE* crypto;
+	FILE* key;
+	FILE* message;
 
 	do{
-		cryptoLength = 0;
-		crypto = getFilePtr("Enter cryptograph filename: ", &cryptoLength);
-		fprintf(stderr,"Used this file? y/n: \n");
+		cryptoLen = 0;
+		crypto = getFilePtr("\nEnter cryptograph filename: ", &cryptoLen);
+		fprintf(stderr,"\nUsed this file? y/n: ");
 		answer = getchar();
 	}while(answer != 'y');
 
-	int keyLen = 0;
-	FILE* key = getFilePtr("Enter KEY filename: ", &keyLen);
 
-	char binMessage [cryptoLength];
+	key = getFilePtr("\nEnter KEY filename: ", &keyLen);
 
-	xorDE (crypto, key, binMessage, cryptoLength);
-	printf("\n\n Converting to plaintext.\n\n");
+	char binMessage [cryptoLen];
+	xorDE (crypto, key, binMessage, cryptoLen);
+
+	fclose(key);
+	fclose(crypto);
+
+	fprintf(stderr, "\nSave message as: ");
+	getLine(fileName, sizeof(fileName));
+	message = fopen(fileName, "w");
+
+	printf("\n\nConverting to plaintext.\n\n");
 	
 	
-	for (int i = 0; i < cryptoLength; i += 8)
+	for (int i = 0; i < cryptoLen; i += 8)
 	{
 		answer = '0' - '0';
 		answer += (binMessage[i] - '0');
@@ -79,19 +89,20 @@ void decrypt()
 		answer += (64*(binMessage[i+6] - '0'));
 		answer += (128*(binMessage[i+7] - '0'));
 
-		fprintf(stderr, "%c", answer );
+		fprintf(stderr, "%c", answer);
+		fprintf(message, "%c", answer);
 	}
-
 }
 
 
 void encrypt(void)
 {
 	char answer;
-	FILE* key;
 	int keyLen = 0, messageLen = 0;
-
-	FILE* message = getFilePtr("\nEnter name of file to encript: ", &messageLen);
+	FILE* message;
+	FILE* key;
+	
+	message = getFilePtr("\nEnter name of file to encript: ", &messageLen);
 
 	while(answer != 'y' && answer != 'n')
 	{
@@ -116,13 +127,11 @@ void encrypt(void)
 
 	xor (binMessage, key, crypto, messageLen);
 
-	fprintf(stderr,"\nCryto Message generated, enter target filename: ");
+	fprintf(stderr,"\nCryto Message generated. Save as: ");
 	char cryptoName [20];
 	getLine(cryptoName, sizeof(cryptoName));
-
 	genFile(cryptoName, crypto, 8 * messageLen);
 	fprintf(stderr,"File Created\n");
-
 }
 
 FILE* getFilePtr(char * prompt, int * lenth)
@@ -166,11 +175,10 @@ FILE* getFilePtr(char * prompt, int * lenth)
 					c = fgetc(f);
 				}
 				rewind(f);
-				fprintf(stderr,"Char count: %d\n\n", *lenth);
+				fprintf(stderr,"Char count: %d\n", *lenth);
 				read = 2;
 			}
 		}
-
 	}while(read != 2);
 	return f;
 }
@@ -210,7 +218,7 @@ FILE* keyGen(int lenth)
 	fclose(f);
 	f = fopen(fileName, "r");
 
-	fprintf(stderr,"\nKey generated, saved as %s", fileName);
+	fprintf(stderr,"\nKey generated, saved as: %s.", fileName);
 	return f;
 }
 
@@ -244,7 +252,7 @@ void FILEToBin (FILE* message, char* dest, int charCount)
 			temp++; 
 		}
 	}
-	fprintf(stderr,"\nPlaintext binary message generated\n");
+	fprintf(stderr,"\nPlaintext binary message generated.\n");
 }
 
 void genFile (char * fileName, char * content, int charCount)
@@ -259,7 +267,7 @@ void genFile (char * fileName, char * content, int charCount)
 
 void xorDE (FILE* crypto, FILE * key, char* plain, int charCount)
 {
-	fprintf(stderr,"\nDeciphering file:");
+	fprintf(stderr,"\nDeciphering file: ");
 	char k;
 	char c;
 	for (int i = 0; i < charCount; ++i)
@@ -271,5 +279,5 @@ void xorDE (FILE* crypto, FILE * key, char* plain, int charCount)
 		else
 			plain[i] = '1';
 	}
-	fprintf(stderr,"\nFile Deciphered:");
+	fprintf(stderr,"File Deciphered.");
 }
