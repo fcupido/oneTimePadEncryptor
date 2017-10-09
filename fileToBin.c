@@ -20,19 +20,14 @@ int main(void)
 
 void FILEToBin (FILE* message, FILE* dest)
 {
-	int c = 0;
-	for(int j = 0; 1; j++)
-	{
-		c = fgetc(message);
-		if (c == EOF)
-		{
-			break;
-		}
+	int c = fgetc(message);
+	do{
 		for (int i = 0; i < 8; ++i)
 		{
 			fprintf(dest, "%c", (c % 2) + '0');
 			c = c / 2;
 		}
-	}
+		c = fgetc(message);
+	}while(c != EOF);
 	fprintf(stderr,"\nPlaintext binary message generated.\n");
 }
