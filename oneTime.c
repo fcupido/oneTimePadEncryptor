@@ -126,13 +126,12 @@ void encrypt(void)
 	char binMessage [8 * messageLen];
 	char crypto [8 * messageLen];
 
-	fprintf(stderr, "Going into FILEToBin\n");
+	fprintf(stderr, "\n\nKey in binary: \n");
 	FILEToBin(keyRAW, key);
-	fprintf(stderr, "Key binary generated\n");
+	fprintf(stderr, "\n\nMessage in binary: \n");
 	FILEToBin(message, binMessage);
-	fprintf(stderr, "Binary message obtained\n");
 
-
+	fprintf(stderr, "\n\nxor Results: \n");
 	xor (binMessage, key, crypto, messageLen);
 
 	fprintf(stderr,"\nCryto Message generated. Save as: ");
@@ -223,6 +222,7 @@ FILE* keyGen(int lenth)
 	f = fopen(fileName, "w");
 	srand((unsigned)time(NULL));
 
+	fprintf(stderr, "%s\n", "");
 
 	for (int i = 0; i < lenth; ++i)
 	{
@@ -230,11 +230,14 @@ FILE* keyGen(int lenth)
 			c = 0;
 
 		temp = ((int)rand() % 2);
+		fprintf(stderr, "%d", temp); // for debugging
 
 		c += ((int)pow(2, i % 8)) * temp;
 
 		if((i + 1) % 8 == 0)
-		fprintf(f, "%c", c);
+		{
+			fprintf(f, "%c", c);
+		}
 	}
 	fprintf(f, "%c", EOF);
 	fclose(f);
@@ -244,19 +247,15 @@ FILE* keyGen(int lenth)
 	return f;
 }
 
-void xor (char* messageC, char * key, char* crypto, int charCount)
+void xor (char* message, char * key, char* crypto, int charCount)
 {
-	char k;
-	char* message = messageC;
-
 	for (int i = 0; i < charCount * 8; ++i)
 	{
-		k = key[i];
-		if(*message == k)
+		if(message[i] == key[i])
 			crypto[i] = '0';
 		else
 			crypto[i] = '1';
-		message++;
+		fprintf(stderr, "%c", crypto[i]);
 	}
 }
 
@@ -264,15 +263,17 @@ void FILEToBin (FILE* message, char* dest)
 {
 	printf("In FILEToBin\n");
 	int c = fgetc(message);
+	int j = 0;
 	do{
 		for (int i = 0; i < 8; ++i)
 		{
-			dest[i] = c % 2 + '0';
+			dest[j] = (c % 2) + '0';
+			fprintf(stderr, "%c", dest[j]);
 			c = c / 2;
+			j++;
 		}
 		c = fgetc(message);
 	} while(c != EOF);
-	fprintf(stderr,"\nBinary message generated.\n");
 }
 
 void genFile (char * fileName, char * content, int charCount)
