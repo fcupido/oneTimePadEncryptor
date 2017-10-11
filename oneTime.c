@@ -11,11 +11,10 @@ int getLine (char* buffer, size_t sz);
 FILE* getFilePtr(char * prompt, int * charCount);
 void flush (void);
 FILE* keyGen(int); // compressed
-void xor (char * messageC, char * key, char* crypto, int charCount); // compressed
+void xor (FILE*, FILE*, FILE*, int charCount); // compressed
 void FILEToBin (FILE* message, char* dest);	// compressed
 void genFile (char * fileName, char * content, int charCount); // compressed
 void decrypt(void);
-void xorDE (FILE* messageC, char * key, char* crypto, int charCount); // cpmpressed
 int main(int argc, char const *argv[])
 {
 	char input [3];
@@ -51,7 +50,7 @@ void decrypt()
 	char fileName [20];
 	int cryptoLen = 0, keyLen = 0;
 	FILE* crypto;
-	FILE* keyRAW;
+	FILE* key;
 	FILE* message;
 
 	do{
@@ -62,39 +61,15 @@ void decrypt()
 	}while(answer != 'y');
 
 
-	keyRAW = getFilePtr("\nEnter KEY filename: ", &keyLen);
+	key = getFilePtr("\nEnter KEY filename: ", &keyLen);
 
-	char key [keyLen * 8];
-	FILEToBin(keyRAW, key); 
-
-	char binMessage [cryptoLen * 8];
-	xorDE (crypto, key, binMessage, cryptoLen * 8);
-
-	fclose(keyRAW);
-	fclose(crypto);
 
 	fprintf(stderr, "\nSave message as: ");
 	getLine(fileName, sizeof(fileName));
 	message = fopen(fileName, "w");
 
-	printf("\n\nConverting to plaintext.\n\n");
+	xor (crypto, key, message, cryptoLen);
 	
-	
-	for (int i = 0; i < cryptoLen; i += 8)
-	{
-		answer = '0' - '0';
-		answer += (binMessage[i] - '0');
-		answer += (2*(binMessage[i+1] - '0'));
-		answer += (4*(binMessage[i+2] - '0'));
-		answer += (8*(binMessage[i+3] - '0'));
-		answer += (16*(binMessage[i+4] - '0'));
-		answer += (32*(binMessage[i+5] - '0'));
-		answer += (64*(binMessage[i+6] - '0'));
-		answer += (128*(binMessage[i+7] - '0'));
-
-		fprintf(stderr, "%c", answer);
-		fprintf(message, "%c", answer);
-	}
 }
 
 
@@ -103,7 +78,8 @@ void encrypt(void)
 	char answer;
 	int keyLen = 0, messageLen = 0;
 	FILE* message;
-	FILE* keyRAW;
+	FILE* key;
+	FILE* crypto;
 	
 	message = getFilePtr("\nEnter name of file to encript: ", &messageLen);
 
@@ -115,29 +91,21 @@ void encrypt(void)
 
 	if (answer == 'y')
 	{
-		keyRAW = keyGen(messageLen * 8);
+		key = keyGen(messageLen);
 	}
 
 	if (answer == 'n')
 	{
-		keyRAW = getFilePtr("\nEnter key filename: ", &keyLen);
+		key = getFilePtr("\nEnter key filename: ", &keyLen);
 	}
-	char key [8 * messageLen]; 	
-	char binMessage [8 * messageLen];
-	char crypto [8 * messageLen];
 
-	fprintf(stderr, "\n\nKey in binary: \n");
-	FILEToBin(keyRAW, key);
-	fprintf(stderr, "\n\nMessage in binary: \n");
-	FILEToBin(message, binMessage);
-
-	fprintf(stderr, "\n\nxor Results: \n");
-	xor (binMessage, key, crypto, messageLen);
-
-	fprintf(stderr,"\nCryto Message generated. Save as: ");
+	fprintf(stderr,"\nSave encrypted message as: ");
 	char cryptoName [20];
 	getLine(cryptoName, sizeof(cryptoName));
-	genFile(cryptoName, crypto, messageLen);
+	crypto = fopen(cryptoName, "w");
+
+	xor (message, key, crypto, messageLen);
+
 	fprintf(stderr,"File Created\n");
 }
 
@@ -212,8 +180,6 @@ FILE* keyGen(int lenth)
 {	
 	flush();
 	char fileName [20];
-	char c = '\0';
-	int temp = 0;
 	FILE *f;
 
 	fprintf(stderr,"\nEnter target filename: ");
@@ -226,18 +192,7 @@ FILE* keyGen(int lenth)
 
 	for (int i = 0; i < lenth; ++i)
 	{
-		if (i % 8 == 0)
-			c = 0;
-
-		temp = ((int)rand() % 2);
-		fprintf(stderr, "%d", temp); // for debugging
-
-		c += ((int)pow(2, i % 8)) * temp;
-
-		if((i + 1) % 8 == 0)
-		{
-			fprintf(f, "%c", c);
-		}
+		fprintf(f, "%c", rand() % 127 + 1);
 	}
 	fprintf(f, "%c", EOF);
 	fclose(f);
@@ -247,17 +202,6 @@ FILE* keyGen(int lenth)
 	return f;
 }
 
-void xor (char* message, char * key, char* crypto, int charCount)
-{
-	for (int i = 0; i < charCount * 8; ++i)
-	{
-		if(message[i] == key[i])
-			crypto[i] = '0';
-		else
-			crypto[i] = '1';
-		fprintf(stderr, "%c", crypto[i]);
-	}
-}
 
 void FILEToBin (FILE* message, char* dest)
 {
@@ -296,19 +240,17 @@ void genFile (char * fileName, char * content, int charCount)
 	printf("File generated\n");
 }
 
-void xorDE (FILE* crypto, char * key, char* plain, int charCount)
+void xor (FILE* source, FILE * key, FILE * dest, int charCount)
 {
-	fprintf(stderr,"\nDeciphering file: ");
-	char k;
-	char c;
-	for (int i = 0; i < charCount; ++i)
+
+	char c = fgetc(source);
+	char k = fgetc(key);
+	while(c != EOF)
 	{	
-		c = fgetc(crypto);
-		k = key[i];
-		if(c == k)
-			plain[i] = '0';
-		else
-			plain[i] = '1';
+		fprintf(dest, "%c", c ^ k);
+		fprintf(stderr, "%c", c ^ k); // for debug
+		c = fgetc(source);
+		k = fgetc(key);
 	}
-	fprintf(stderr,"File Deciphered.");
+	fprintf(stderr,"\nFile XORed.");
 }
