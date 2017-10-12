@@ -11,7 +11,7 @@ int getLine (char* buffer, size_t sz);
 FILE* getFilePtr(char * prompt, int * charCount);
 void flush (void);
 FILE* keyGen(int); // compressed
-void xor (FILE*, FILE*, FILE*, int charCount); // compressed
+void xor (FILE* file1, FILE* file2, FILE* destination); // compressed
 void FILEToBin (FILE* message, char* dest);	// compressed
 void genFile (char * fileName, char * content, int charCount); // compressed
 void decrypt(void);
@@ -68,7 +68,7 @@ void decrypt()
 	getLine(fileName, sizeof(fileName));
 	message = fopen(fileName, "w");
 
-	xor (crypto, key, message, cryptoLen);
+	xor (crypto, key, message);
 	
 }
 
@@ -104,7 +104,7 @@ void encrypt(void)
 	getLine(cryptoName, sizeof(cryptoName));
 	crypto = fopen(cryptoName, "w");
 
-	xor (message, key, crypto, messageLen);
+	xor (message, key, crypto);
 
 	fprintf(stderr,"File Created\n");
 }
@@ -202,24 +202,6 @@ FILE* keyGen(int lenth)
 	return f;
 }
 
-
-void FILEToBin (FILE* message, char* dest)
-{
-	printf("In FILEToBin\n");
-	int c = fgetc(message);
-	int j = 0;
-	do{
-		for (int i = 0; i < 8; ++i)
-		{
-			dest[j] = (c % 2) + '0';
-			fprintf(stderr, "%c", dest[j]);
-			c = c / 2;
-			j++;
-		}
-		c = fgetc(message);
-	} while(c != EOF);
-}
-
 void genFile (char * fileName, char * content, int charCount)
 {
 	FILE *f = fopen(fileName, "w");
@@ -240,15 +222,13 @@ void genFile (char * fileName, char * content, int charCount)
 	printf("File generated\n");
 }
 
-void xor (FILE* source, FILE * key, FILE * dest, int charCount)
+void xor (FILE* source, FILE * key, FILE * dest)
 {
-
 	char c = fgetc(source);
 	char k = fgetc(key);
 	while(c != EOF)
 	{	
 		fprintf(dest, "%c", c ^ k);
-		fprintf(stderr, "%c", c ^ k); // for debug
 		c = fgetc(source);
 		k = fgetc(key);
 	}
